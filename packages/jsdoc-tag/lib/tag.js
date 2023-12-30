@@ -73,6 +73,37 @@ function parseType({ dependencies, text, originalTitle }, { canHaveName, canHave
   try {
     return type.parse(text, canHaveName, canHaveType);
   } catch (e) {
+    const regex = /^\{(?<type>(?:[^{}]|[^{}]*?\{[^{}]*?\}[^{}]*?)*?)\} (?<optionalStart>\[)?(?<name>.*?)(?<optionalEnd>\])?(?: -) (?<description>.*?)$/;
+
+    const result = regex.exec(text);
+
+    if (result?.groups) {
+        const {
+            groups: {
+                type,
+                optionalStart,
+                name,
+                optionalEnd,
+                description
+            }
+        } = result;
+
+        if (type && name && description) {
+            const optional = [optionalStart, optionalEnd].every((value) => typeof value !== "undefined");
+
+            const fallback = {
+                name,
+                typeExpression: type,
+                text: description,
+                type: [ type ],
+                parsedType: { type: 'NameExpression', name: type },
+                optional
+            }
+
+            return fallback;
+        }
+    }
+
     log = dependencies.get('log');
     log.error(
       'Unable to parse a tag\'s type expression%s with tag title "%s" and text "%s": %s',

@@ -268,7 +268,7 @@ function hasUrlPrefix(text) {
 
 function isComplexTypeExpression(expr) {
   // record types, type unions, and type applications all count as "complex"
-  return /^{.+}$/.test(expr) || /^.+\|.+$/.test(expr) || /^.+<.+>$/.test(expr);
+  return (/^{.+}$/.test(expr) || /^.+\|.+$/.test(expr) || /^.+<.+>$/.test(expr)) && !(/^\{.*?\[[A-Za-z0-9]+\s?:\s?[A-Za-z0-9]+\]\s?:\s?[A-Za-z0-9]+.*?\}$/.test(expr));
 }
 
 function fragmentHash(fragmentId) {
